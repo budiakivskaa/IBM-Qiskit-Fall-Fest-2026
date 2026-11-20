@@ -10,12 +10,12 @@ Projekt stworzony na **Qiskit Fall Fest**.
 
 | Plik | Opis |
 |---|---|
-| [`quantum_dice_v2.html`](#quantum_dice_v2html--kwantowa-kostka-v2) | Zaawansowana wersja z sferami Blocha 3D i ekranem splątania |
-| [`app2.html`](#app2html--splątane-kostki) | Prostsza wersja skupiona na efekcie splątania i kolapsie stanu |
+| [`quantum_dice.html`](#quantum_dice_v2html--kwantowa-kostka-v2) | Zaawansowana wersja z sferami Blocha 3D i ekranem splątania |
+| [`app.html`](#app2html--splątane-kostki) | Prostsza wersja skupiona na efekcie splątania i kolapsie stanu |
 
 ---
 
-## `quantum_dice_v2.html` — Kwantowa Kostka v2
+## `quantum_dice_v2.html` — Kwantowa Kostka 
 
 ### Idea
 

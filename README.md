@@ -1,4 +1,4 @@
-# ⚛️ Kwantowa Kostka — Qiskit Fall Fest
+# Kwantowa Kostka — Qiskit Fall Fest
 
 Dwie interaktywne aplikacje webowe pokazujące mechanikę kwantową przez analogię do kostki do gry. Działają w pełni **offline**, bez żadnych zależności — wystarczy otworzyć plik HTML w przeglądarce.
 

@@ -1,105 +1,122 @@
-# Kwantowa Kostka 
+# ⚛️ Kwantowa Kostka — Qiskit Fall Fest
 
-Interaktywna demonstracja mechaniki kwantowej w przeglądarce — działa w pełni offline, bez żadnych zależności. Stworzona na **Qiskit Fall Fest**.
+Dwie interaktywne aplikacje webowe pokazujące mechanikę kwantową przez analogię do kostki do gry. Działają w pełni **offline**, bez żadnych zależności — wystarczy otworzyć plik HTML w przeglądarce.
 
-## Demo
-
-Otwórz plik `quantum_dice_v2.html` w przeglądarce. Nie jest wymagany serwer ani instalacja.
+Projekt stworzony na **Qiskit Fall Fest**.
 
 ---
 
-## Idea
+## Pliki
 
-Kostka do gry zbudowana jest z **3 kubitów**, co daje 8 możliwych wyników (000–111). Wynik odczytuje się jako liczbę binarną i dodaje 1 — otrzymując ściankę 1–6. Wyniki `110` i `111` oznaczają, że **kostka spadła ze stołu** i rzut jest powtarzany.
-
-Gracz ustawia kubity przeciągając punkt na **sferze Blocha** i obserwuje, jak zmienia się rozkład prawdopodobieństwa ścianek w czasie rzeczywistym.
+| Plik | Opis |
+|---|---|
+| [`quantum_dice_v2.html`](#quantum_dice_v2html--kwantowa-kostka-v2) | Zaawansowana wersja z sferami Blocha 3D i ekranem splątania |
+| [`app2.html`](#app2html--splątane-kostki) | Prostsza wersja skupiona na efekcie splątania i kolapsie stanu |
 
 ---
 
-## Ekrany
+## `quantum_dice_v2.html` — Kwantowa Kostka v2
 
-### 🎲 Ekran 1 — Ustaw kostkę
+### Idea
 
-Trzy sfery Blocha dla kubitów **A** (MSB), **B** i **C** (LSB).
+Kostka zbudowana z **3 kubitów** daje 8 możliwych wyników (000–111). Wynik odczytuje się binarnie i dodaje 1 → ścianki 1–6. Wyniki `110` i `111` oznaczają, że kostka **spadła ze stołu** i rzut jest powtarzany.
 
-- **Przeciąganie lewym przyciskiem** → przesuwa punkt kwantowy na sferze (zmienia θ i φ)
-- **Przeciąganie prawym przyciskiem lub Ctrl+drag** → obraca kamerę, by obejrzeć kulę z każdej strony
-- **Przycisk H** przy każdej sferze → nakłada bramkę Hadamarda z animacją przejścia punktu
+### Ekran 1 — Ustaw kostkę
+
+- **Trzy sfery Blocha 3D** dla kubitów A, B, C — punkt na sferze reprezentuje stan kwantowy kubitu
+- Przeciąganie punktu zmienia θ (prawdopodobieństwo) i φ (fazę)
+- **Biegun północny** = pewne `|0⟩`, **biegun południowy** = pewne `|1⟩`, **równik** = superpozycja 50/50
+- **Przycisk H** — nakłada bramkę Hadamarda z animacją przejścia punktu na sferze
 - **Ściąga** (tabelka wynik → kubity A B C) z podświetleniem najbardziej prawdopodobnej ścianki
-- **Histogram teoretyczny** — aktualizuje się na żywo przy każdym ruchu
-- **Histogram rzeczywisty** — wypełnia się po kliknięciu „Rzuć 120 razy"; licznik pokazuje ile razy kostka „spadła ze stołu"
-- **Animowana kostka 3D** do pojedynczego rzutu
+- **Histogram teoretyczny** — aktualizuje się na żywo
+- **Histogram rzeczywisty** — 120 rzutów z animacją i licznikiem powtórek
 
-**Przykłady do demonstracji:**
-| Ustawienie | Efekt |
-|---|---|
-| Kubity w pozycji południe-północ-południe | Szóstka w 100% |
-| H na wszystkich trzech od stanu \|000⟩ | Uczciwa kostka (równy rozkład) |
-| H → obrót fazy 180° → H | Pewne 0 zamienia się w pewne 1, choć po drodze histogram wyglądał losowo |
+### Ekran 2 — Splącz z kostką kolegi
 
----
+- **Dwie kostki** (X i Y), każda z trzema sferami Blocha
+- **Kable CNOT** — splątują odpowiadające sobie kubity kostek X i Y
+- Gdy kubit zostaje splątany, jego punkt **zapada się do wnętrza kuli** — kubit nie ma już własnego stanu
+- **„Rzuć tylko X"** → histogram Y natychmiast zapada się do jednego słupka (kolaps splątanego stanu)
+- **Siatka 6×6** z rozkładem wspólnych wyników
+- **Tryb zaawansowany** — H przed pomiarem, pokazuje różnicę między splątaniem a klasyczną korelacją
 
-### 🔗 Ekran 2 — Splącz z kostką kolegi
-
-Dwie kostki: **X** (twoja, edytowalna) i **Y** (kolegi, startuje z \|000⟩).
-
-- **Trzy sfery Blocha dla każdej kostki** — drag i przycisk H tak samo jak na ekranie 1
-- **Kable CNOT** — kliknięcie kabla splata odpowiadające sobie kubity kostek X i Y przez bramkę CNOT
-  - Gdy kubit zostaje splątany, jego punkt **zapada się do wnętrza kuli**
-  - Przy pełnym splątaniu punkt ląduje w środku — kubit nie ma już własnego stanu
-  - Odłączenie kabla powoduje powrót punktu na powierzchnię
-- **Tryb zaawansowany** — nakłada H na wszystkie kubity tuż przed pomiarem (pomiar „pod innym kątem"), co pozwala odróżnić prawdziwe splątanie od klasycznej korelacji
-- **Histogramy X i Y** osobno + **siatka 6×6** wspólnych wyników
-- **Rzuć tylko X** → histogram Y natychmiast zapada się do jednego słupka (kolaps splątanego stanu)
-
-**Co można odkryć:**
-- 1 kabel → kostki zawsze mają tę samą parzystość
-- 3 kable → zawsze ta sama liczba na obu kostkach (przekątna siatki)
-- Tryb zaawansowany → korelacja splątana utrzymuje się, korelacja klasyczna ginie
-
----
-
-## Silnik kwantowy
-
-Cały kod zawarty jest w jednym pliku HTML (~1400 linii), bez frameworków.
-
-| Klasa / funkcja | Opis |
-|---|---|
-| `QState(n)` | Wektor amplitud zespolonych dla n kubitów (2ⁿ liczb). Operacje: Ry, Rz, H, CNOT, sample, collapse |
-| `QState6` | 6-kubitowy stan (64 amplitudy) dla ekranu 2; metody marginalnych prawdopodobieństw, próbkowania par |
-| `blochVector(k)` | Oblicza wektor Blocha kubitu k z macierzy gęstości (Tr_others). Dla splątanego zwraca punkt wewnątrz kuli (r < 1) |
-| `drawBloch()` | Renderer sfery 3D na `<canvas>` — siatka równoleżników/południków, rzut ortograficzny, obrót kamery |
-| `diceProbs(p8)` | Przekształca 8 prawdopodobieństw bazowych na 7 wartości (ścianki 1–6 + „spadła ze stołu") |
-
-### Bramki
-
-- **Ry(θ)** — obrót wokół osi Y sfery Blocha; wyznacza stosunek P(|0⟩) do P(|1⟩)
-- **Rz(φ)** — obrót wokół osi Z; ustawia fazę przy |1⟩
-- **H** — `(a, b) → ((a+b)/√2, (a−b)/√2)` dla każdej pary amplitud różniących się danym bitem
-- **CNOT** — zamienia amplitudy kubitu docelowego tam, gdzie kubit sterujący ma 1
-
-### Sfera Blocha a splątanie
-
-Dla kubitu niesplątanego macierz gęstości zredukowana `ρ = Tr_B(|ψ⟩⟨ψ|)` odpowiada punktowi na **powierzchni** kuli (czystość = 1). Dla kubitu splątanego `ρ = I/2` (stan maksymalnie mieszany), co odpowiada **środkowi** kuli — kubit nie ma własnego kierunku.
-
----
-
-## Sterowanie sferą Blocha
+### Sterowanie sferą Blocha
 
 | Akcja | Efekt |
 |---|---|
-| Lewy przycisk myszy + drag | Przesuwa punkt kwantowy (zmienia stan kubitu) |
-| Prawy przycisk myszy + drag | Obraca kamerę |
-| Ctrl + drag | Obraca kamerę |
-| Przycisk H | Nakłada bramkę Hadamarda z animacją |
+| Lewy przycisk + drag | Przesuwa punkt kwantowy (zmienia stan kubitu) |
+| Prawy przycisk + drag lub Ctrl+drag | Obraca kamerę |
+| Przycisk **H** | Bramka Hadamarda z animacją |
+
+---
+
+## `app2.html` — Splątane kostki
+
+### Idea
+
+Uproszczona demonstracja skupiona na jednym efekcie: **jak pomiar jednej kostki natychmiast zmienia rozkład prawdopodobieństwa drugiej** (kolaps stanu kwantowego).
+
+### Funkcje
+
+- **Dwie kostki** (A i B) z przełącznikiem splątania
+- **Tryb niezależny** — obie kostki mają własne pokrętła i niezależne rozkłady; rzut A nie wpływa na B
+- **Tryb splątany** — kostki tworzą jeden wspólny stan kwantowy; po rzucie A histogram B natychmiast się zmienia
+- **Pokrętła** — 3 parametry na kostkę, kontrolujące rotacje Ry na poszczególnych kubitach
+- **Histogramy** prawdopodobieństw dla A i B osobno
+- **Siatka 6×6** wspólnych wyników
+
+---
+
+## Silnik kwantowy (wspólny)
+
+Obie aplikacje implementują pełny silnik kwantowy w czystym JavaScript — bez żadnych bibliotek.
+
+```
+Stan = wektor amplitud zespolonych [re, im] × 2ⁿ
+```
+
+| Operacja | Opis |
+|---|---|
+| `Ry(θ)` | Obrót wokół osi Y sfery Blocha — ustawia P(\|0⟩) i P(\|1⟩) |
+| `Rz(φ)` | Obrót wokół osi Z — ustawia fazę |
+| `H` | Bramka Hadamarda: `(a,b) → ((a+b)/√2, (a−b)/√2)` |
+| `CNOT` | Zamiana amplitud kubitu docelowego gdy kubit sterujący = \|1⟩ |
+| `collapse(k)` | Zerowanie niezgodnych amplitud + normalizacja — kolaps stanu |
+| `blochVector(k)` | Macierz gęstości zredukowana → wektor `[x,y,z]`; \|r\|<1 dla splątanego kubitu |
+
+### Splątanie przez CNOT
+
+```
+|ψ_A⟩ ⊗ |0⟩  →CNOT→  stan splątany
+
+Przykład (A w superpozycji):
+(α|0⟩ + β|1⟩) ⊗ |0⟩  →  α|00⟩ + β|11⟩
+```
+
+Po pomiarze A = 0: stan natychmiast zapada się do `|00⟩` → B na pewno = 0.  
+Po pomiarze A = 1: stan natychmiast zapada się do `|11⟩` → B na pewno = 1.
 
 ---
 
 ## Wymagania
 
 - Nowoczesna przeglądarka (Chrome, Firefox, Safari, Edge)
-- Brak połączenia z internetem — plik działa w pełni lokalnie
-- Responsywny układ działa na tabletach i telefonach
+- Brak połączenia z internetem — pliki działają w pełni lokalnie
+- Brak instalacji, brak node.js, brak zależności
+
+---
+
+## Uruchomienie
+
+```
+# Sklonuj repozytorium
+git clone <url>
+
+# Otwórz wybrany plik w przeglądarce
+start quantum_dice_v2.html   # Windows
+open quantum_dice_v2.html    # macOS
+xdg-open quantum_dice_v2.html  # Linux
+```
 
 ---
 

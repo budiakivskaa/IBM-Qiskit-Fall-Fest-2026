@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Splątane kostki kwantowe</title>
+
+<style>
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --panel2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --blue: #58a6ff;
+  --purple: #bc8cff;
+  --green: #3fb950;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  padding: 15px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+header h1 {
+  color: var(--blue);
+  font-size: 25px;
+  margin-bottom: 8px;
+}
+
+header p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+h2 {
+  font-size: 17px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.description {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.dice-area {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.dice {
+  background: var(--panel2);
+  border-radius: 10px;
+  padding: 15px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dice h2 {
+  color: var(--blue);
+}
+
+.dice-b {
+  color: var(--purple) !important;
+}
+
+.dice-number {
+  font-size: 55px;
+  min-height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dice-name {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.connection {
+  text-align: center;
+  color: var(--green);
+  font-size: 12px;
+}
+
+.connection button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--panel2);
+  color: var(--muted);
+  border: 2px solid var(--border);
+  font-size: 23px;
+  cursor: pointer;
+  margin: 4px 0;
+  transition: all 0.2s;
+}
+
+.connection button.on {
+  color: var(--green);
+  border-color: var(--green);
+  background: #183322;
+  box-shadow: 0 0 12px rgba(63, 185, 80, 0.35);
+}
+
+.dice-roll-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 5px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #0d1117;
+  background: var(--blue);
+  cursor: pointer;
+  transition: filter .2s, transform .2s;
+}
+
+.dice-b-btn {
+  background: var(--purple);
+}
+
+.dice-roll-btn:active {
+  transform: scale(.94);
+  filter: brightness(1.2);
+}
+
+.reset-btn {
+  display: block;
+  margin: 12px auto 0;
+  padding: 8px 16px;
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.reset-btn:hover {
+  border-color: var(--blue);
+}
+
+#result {
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--green);
+  margin-top: 12px;
+  min-height: 22px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+@media (min-width: 600px) {
+  .settings-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.settings-box {
+  background: var(--panel2);
+  border-radius: 10px;
+  padding: 10px;
+  transition: opacity 0.2s;
+}
+
+.settings-box.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.settings-box h3 {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.setting {
+  text-align: center;
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 6px 2px;
+}
+
+.setting canvas {
+  width: 58px;
+  height: 58px;
+  max-width: 100%;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.setting p {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.prob-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .prob-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.prob-col h3 {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.prob-status {
+  font-size: 11px;
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 8px;
+  min-height: 15px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 18px 1fr 44px;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 12px;
+}
+
+.bar {
+  height: 13px;
+  background: var(--panel2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 8px;
+  transition: width .25s ease;
+}
+
+.bar-fill.purple {
+  background: var(--purple);
+}
+
+#joint-grid {
+  max-width: 340px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 20px repeat(6, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.cell {
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 3px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  overflow: hidden;
+}
+
+.head {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.explanation {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.explanation strong {
+  color: var(--text);
+}
+
+@media (min-width: 650px) {
+  body {
+    max-width: 760px;
+    margin: auto;
+  }
+}
+
+/* Animacja rzutu */
+.dice-number.rolling {
+  animation: diceRoll .12s linear infinite;
+}
+
+@keyframes diceRoll {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(15deg) scale(1.15); }
+  50% { transform: rotate(0deg) scale(.9); }
+  75% { transform: rotate(-15deg) scale(1.15); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>⚛️ Splątane kostki</h1>
+  <p>Porównaj zwykłe, niezależne rzuty z kostkami połączonymi splątaniem kwantowym.</p>
+</header>
+
+<section class="panel">
+  <h2>🎲 Dwie kostki</h2>
+  <p class="description" id="modeDesc">
+    Tryb niezależny: rzut jedną kostką nie wpływa na drugą. Obie mają niezależne szanse (domyślnie po 1/6).
+  </p>
+
+  <div class="dice-area">
+    <div class="dice">
+      <h2>Kostka A</h2>
+      <div class="dice-number" id="faceA">🎲</div>
+      <p class="dice-name">Pierwsza kostka</p>
+      <button class="dice-roll-btn" onclick="rollA()">🎲 Rzuć A</button>
+    </div>
+
+    <div class="connection">
+      <p>Splątanie</p>
+      <button id="connection" onclick="toggleConnection()">🔗</button>
+      <p id="connectionText">Wyłączone</p>
+    </div>
+
+    <div class="dice">
+      <h2 class="dice-b">Kostka B</h2>
+      <div class="dice-number" id="faceB">🎲</div>
+      <p class="dice-name">Druga kostka</p>
+      <button class="dice-roll-btn dice-b-btn" onclick="rollB()">🎲 Rzuć B</button>
+    </div>
+  </div>
+
+  <div id="result"></div>
+  <button class="reset-btn" onclick="resetRound()">🔄 Resetuj stan przed kolejnym rzutem</button>
+</section>
+
+<section class="panel">
+  <h2>📊 Szanse na wynik (Kostka A i Kostka B)</h2>
+  <p class="description">
+    Wykresy pokazują bieżące prawdopodobieństwo wyrzucenia każdej liczby. W trybie splątanym pomiar jednej kostki natychmiast zmienia rozkład szans drugiej!
+  </p>
+
+  <div class="prob-grid">
+    <div class="prob-col">
+      <h3 style="color: var(--blue);">Szanse Kostki A</h3>
+      <div class="prob-status" id="statusA">Rozkład niezależny (1/6 = 16.7%)</div>
+      <div id="probA"></div>
+    </div>
+
+    <div class="prob-col">
+      <h3 style="color: var(--purple);">Szanse Kostki B</h3>
+      <div class="prob-status" id="statusB">Rozkład niezależny (1/6 = 16.7%)</div>
+      <div id="probB"></div>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>⚙️ Ustawienia rozkładu szans</h2>
+  <p class="description" id="settingsDesc">
+    Domyślnie wszystkie strzałki są na górze, co daje uczciwą kostkę (1/6 na każdą ściankę). Obracaj pokrętła, aby zmienić szanse.
+  </p>
+
+  <div class="settings-grid">
+    <div class="settings-box" id="boxA">
+      <h3 style="color: var(--blue);">Pokrętła Kostki A</h3>
+      <div class="settings">
+        <div class="setting">
+          <canvas id="dialA0" width="100" height="100"></canvas>
+          <p>Ustawienie 1</p>
+        </div>
+        <div class="setting">
+          <canvas id="dialA1" width="100" height="100"></canvas>
+          <p>Ustawienie 2</p>
+        </div>
+        <div class="setting">
+          <canvas id="dialA2" width="100" height="100"></canvas>
+          <p>Ustawienie 3</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-box" id="boxB">
+      <h3 style="color: var(--purple);" id="titleBoxB">Pokrętła Kostki B</h3>
+      <div class="settings">
+        <div class="setting">
+          <canvas id="dialB0" width="100" height="100"></canvas>
+          <p>Ustawienie 1</p>
+        </div>
+        <div class="setting">
+          <canvas id="dialB1" width="100" height="100"></canvas>
+          <p>Ustawienie 2</p>
+        </div>
+        <div class="setting">
+          <canvas id="dialB2" width="100" height="100"></canvas>
+          <p>Ustawienie 3</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>🔗 Wspólna tabela wyników (A × B)</h2>
+  <p class="description">
+    Wiersze to wynik Kostki A, kolumny to wynik Kostki B. Tabela pokazuje łączne szanse par wyników.
+  </p>
+  <div id="joint-grid"></div>
+</section>
+
+<section class="panel">
+  <h2>💡 Co tutaj się dzieje?</h2>
+  <div class="explanation">
+    <p>
+      <strong>1. Brak splątania (Połączenie wyłączone)</strong><br>
+      Kostki A i B są całkowicie niezależne. Domyślnie każda ścianka ma szansę <strong>1/6 (16.7%)</strong>. Rzut kostką A nie zmienia ani wyniku, ani wykresu szans kostki B.
+    </p>
+    <br>
+    <p>
+      <strong>2. Splątanie włączone (Połączenie aktywne)</strong><br>
+      Kostki tworzą jeden wspólny układ kwantowy. Dopóki nie rzucisz żadną z nich, obie mają rozmyte prawdopodobieństwo. Kiedy jednak rzucisz np. <strong>Kostką A</strong> i wypadnie konkretna liczba, stan ulega redukcji (kolapsowi) i <strong>natychmiast zmienia się rozkład prawdopodobieństwa na Kostce B</strong>!
+    </p>
+  </div>
+</section>
+
+<script>
+// ======================================
+// SYMULACJA KWANTOWA (2 x 3 kubity = 64 stany)
+// ======================================
+
+const N = 64;
+
+class QuantumState {
+  constructor() {
+    this.re = new Float64Array(N);
+    this.im = new Float64Array(N);
+    this.re[0] = 1;
+  }
+
+  // Bramka Hadamarda dla równomiernej superpozycji (1/6)
+  hadamard(k) {
+    const invSqrt2 = Math.SQRT1_2;
+    for (let i = 0; i < N; i++) {
+      if (i & (1 << k)) continue;
+      const j = i | (1 << k);
+
+      const a = this.re[i], b = this.im[i];
+      const x = this.re[j], y = this.im[j];
+
+      this.re[i] = (a + x) * invSqrt2;
+      this.im[i] = (b + y) * invSqrt2;
+      this.re[j] = (a - x) * invSqrt2;
+      this.im[j] = (b - y) * invSqrt2;
+    }
+  }
+
+  rotate(k, angle) {
+    const c = Math.cos(angle / 2);
+    const s = Math.sin(angle / 2);
+
+    for (let i = 0; i < N; i++) {
+      if (i & (1 << k)) continue;
+      const j = i | (1 << k);
+
+      const a = this.re[i], b = this.im[i];
+      const x = this.re[j], y = this.im[j];
+
+      this.re[i] = c * a - s * x;
+      this.im[i] = c * b - s * y;
+      this.re[j] = s * a + c * x;
+      this.im[j] = s * b + c * y;
+    }
+  }
+
+  // Splątanie kubitu k kostki A z kubitem k+3 kostki B (CNOT)
+  connect(k) {
+    for (let i = 0; i < N; i++) {
+      if (!(i & (1 << k))) continue;
+      if (i & (1 << (k + 3))) continue;
+
+      const j = i | (1 << (k + 3));
+      [this.re[i], this.re[j]] = [this.re[j], this.re[i]];
+      [this.im[i], this.im[j]] = [this.im[j], this.im[i]];
+    }
+  }
+
+  // Rzutowanie tylko na poprawne ścianki kostki (0..5 dla A oraz 0..5 dla B)
+  projectValidDice() {
+    for (let i = 0; i < N; i++) {
+      const a = i & 7;
+      const b = (i >> 3) & 7;
+      if (a >= 6 || b >= 6) {
+        this.re[i] = 0;
+        this.im[i] = 0;
+      }
+    }
+    this.normalize();
+  }
+
+  probabilities() {
+    return Array.from({ length: N }, (_, i) => this.re[i] ** 2 + this.im[i] ** 2);
+  }
+
+  collapseA(value0to5) {
+    for (let i = 0; i < N; i++) {
+      if ((i & 7) !== value0to5) {
+        this.re[i] = 0;
+        this.im[i] = 0;
+      }
+    }
+    this.normalize();
+  }
+
+  collapseB(value0to5) {
+    for (let i = 0; i < N; i++) {
+      if (((i >> 3) & 7) !== value0to5) {
+        this.re[i] = 0;
+        this.im[i] = 0;
+      }
+    }
+    this.normalize();
+  }
+
+  normalize() {
+    let sum = 0;
+    for (let i = 0; i < N; i++) {
+      sum += this.re[i] ** 2 + this.im[i] ** 2;
+    }
+    const norm = Math.sqrt(sum);
+    if (!norm) return;
+    for (let i = 0; i < N; i++) {
+      this.re[i] /= norm;
+      this.im[i] /= norm;
+    }
+  }
+}
+
+// ======================================
+// STAN APLIKACJI
+// ======================================
+
+let anglesA = [0, 0, 0];
+let anglesB = [0, 0, 0];
+let connected = false;
+
+let currentState;
+let lastA = -1;
+let lastB = -1;
+let collapsedBy = null; // null, "A" lub "B"
+
+function createFreshState() {
+  const q = new QuantumState();
+
+  // Startujemy od równomiernej superpozycji (każda ścianka ma 1/6 przy kącie 0)
+  for (let k = 0; k < 6; k++) {
+    q.hadamard(k);
+  }
+
+  // Modyfikacja rozkładu Kostki A
+  q.rotate(2, anglesA[0]);
+  q.rotate(1, anglesA[1]);
+  q.rotate(0, anglesA[2]);
+
+  if (connected) {
+    // W trybie splątanym stan B powstaje ze splątania ze stanem A
+    for (let k = 3; k < 6; k++) {
+      q.hadamard(k); // cofamy Hadamarda na B, aby CNOT przeniósł stan A
+    }
+    q.connect(0);
+    q.connect(1);
+    q.connect(2);
+  } else {
+    // W trybie niezależnym Kostka B ma własne pokrętła
+    q.rotate(5, anglesB[0]);
+    q.rotate(4, anglesB[1]);
+    q.rotate(3, anglesB[2]);
+  }
+
+  q.projectValidDice();
+  return q;
+}
+
+function resetRound() {
+  lastA = -1;
+  lastB = -1;
+  collapsedBy = null;
+  document.getElementById("faceA").textContent = "🎲";
+  document.getElementById("faceB").textContent = "🎲";
+  document.getElementById("result").textContent = "";
+  currentState = createFreshState();
+  updateAllViews();
+}
+
+// ======================================
+// OBLICZANIE PRAWDOPODOBIEŃSTW
+// ======================================
+
+function getMarginalProbabilities(q, side) {
+  const probs = Array(6).fill(0);
+  const p = q.probabilities();
+
+  for (let i = 0; i < N; i++) {
+    const a = i & 7;
+    const b = (i >> 3) & 7;
+    if (a < 6 && b < 6) {
+      const idx = side === "A" ? a : b;
+      probs[idx] += p[i];
+    }
+  }
+  return probs;
+}
+
+function sampleFromProbs(probs) {
+  let r = Math.random();
+  for (let i = 0; i < probs.length; i++) {
+    r -= probs[i];
+    if (r <= 0) return i + 1;
+  }
+  return 6;
+}
+
+// ======================================
+// POKRĘTŁA (DLA A ORAZ B)
+// ======================================
+
+function drawDial(id, angle, color) {
+  const cv = document.getElementById(id);
+  const ctx = cv.getContext("2d");
+  const x = 50, y = 50, r = 40;
+
+  ctx.clearRect(0, 0, 100, 100);
+
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = "#161b22";
+  ctx.fill();
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  const ax = x + 30 * Math.sin(angle);
+  const ay = y - 30 * Math.cos(angle);
+
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(ax, ay);
+  ctx.strokeStyle = "#e6edf3";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(ax, ay, 5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function setupDial(id, side, index) {
+  const cv = document.getElementById(id);
+  const color = side === "A" ? "#58a6ff" : "#bc8cff";
+
+  function move(e) {
+    if (side === "B" && connected) return;
+
+    const rect = cv.getBoundingClientRect();
+    const px = (e.clientX - rect.left) * (cv.width / rect.width);
+    const py = (e.clientY - rect.top) * (cv.height / rect.height);
+    const angle = Math.atan2(px - 50, 50 - py);
+
+    if (side === "A") anglesA[index] = angle;
+    else anglesB[index] = angle;
+
+    drawDial(id, angle, color);
+    resetRound();
+  }
+
+  let dragging = false;
+  cv.addEventListener("pointerdown", e => {
+    dragging = true;
+    cv.setPointerCapture(e.pointerId);
+    move(e);
+  });
+  cv.addEventListener("pointermove", e => { if (dragging) move(e); });
+  cv.addEventListener("pointerup", () => { dragging = false; });
+  cv.addEventListener("pointercancel", () => { dragging = false; });
+}
+
+// ======================================
+// RYSOWANIE WYKRESÓW I TABELI
+// ======================================
+
+function renderBars(containerId, probs, isPurple) {
+  document.getElementById(containerId).innerHTML = probs.map((val, i) => {
+    const pct = (val * 100).toFixed(1).replace(".0", "");
+    return `
+      <div class="bar-row">
+        <span>${i + 1}</span>
+        <div class="bar">
+          <div class="bar-fill ${isPurple ? "purple" : ""}" style="width:${val * 100}%"></div>
+        </div>
+        <span>${pct}%</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function drawProbabilities() {
+  const pA = getMarginalProbabilities(currentState, "A");
+  const pB = getMarginalProbabilities(currentState, "B");
+
+  renderBars("probA", pA, false);
+  renderBars("probB", pB, true);
+
+  const stA = document.getElementById("statusA");
+  const stB = document.getElementById("statusB");
+
+  if (!connected) {
+    stA.textContent = "Niezależny rozkład szans kostki A";
+    stB.textContent = "Niezależny rozkład szans kostki B";
+  } else {
+    if (collapsedBy === null) {
+      stA.textContent = "Splątana (przed pomiarem)";
+      stB.textContent = "Splątana (przed pomiarem)";
+    } else if (collapsedBy === "A") {
+      stA.textContent = `Zmierzono wynik: ${lastA}`;
+      stB.textContent = `Zaktualizowane szanse po rzucie A!`;
+    } else if (collapsedBy === "B") {
+      stA.textContent = `Zaktualizowane szanse po rzucie B!`;
+      stB.textContent = `Zmierzono wynik: ${lastB}`;
+    }
+  }
+}
+
+function drawJointGrid() {
+  const p = currentState.probabilities();
+  const joint = Array.from({ length: 6 }, () => Array(6).fill(0));
+
+  for (let i = 0; i < N; i++) {
+    const a = i & 7;
+    const b = (i >> 3) & 7;
+    if (a < 6 && b < 6) {
+      joint[a][b] += p[i];
+    }
+  }
+
+  let html = '<div class="cell head">A\\B</div>';
+  for (let b = 1; b <= 6; b++) {
+    html += `<div class="cell head">${b}</div>`;
+  }
+
+  for (let a = 0; a < 6; a++) {
+    html += `<div class="cell head">${a + 1}</div>`;
+    for (let b = 0; b < 6; b++) {
+      const value = joint[a][b];
+      const alpha = Math.min(1, value * 5);
+      html += `
+        <div class="cell" style="background:rgba(88,166,255,${alpha})">
+          ${value > 0.005 ? Math.round(value * 100) + "%" : ""}
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById("joint-grid").innerHTML = html;
+}
+
+function updateAllViews() {
+  drawProbabilities();
+  drawJointGrid();
+}
+
+// ======================================
+// PRZEŁĄCZANIE SPLĄTANIA
+// ======================================
+
+function toggleConnection() {
+  connected = !connected;
+
+  const btn = document.getElementById("connection");
+  btn.classList.toggle("on", connected);
+  document.getElementById("connectionText").textContent = connected ? "Włączone" : "Wyłączone";
+
+  const boxB = document.getElementById("boxB");
+  const titleBoxB = document.getElementById("titleBoxB");
+  const modeDesc = document.getElementById("modeDesc");
+
+  if (connected) {
+    boxB.classList.add("disabled");
+    titleBoxB.textContent = "Kostka B (zależna od A)";
+    modeDesc.textContent = "Tryb splątany: rzut jedną kostką natychmiast zmienia prawdopodobieństwo wyników na drugiej!";
+  } else {
+    boxB.classList.remove("disabled");
+    titleBoxB.textContent = "Pokrętła Kostki B";
+    modeDesc.textContent = "Tryb niezależny: rzut jedną kostką nie wpływa na drugą. Obie mają niezależne szanse (domyślnie po 1/6).";
+  }
+
+  resetRound();
+}
+
+// ======================================
+// RZUTY KOSTKAMI
+// ======================================
+
+const emojis = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+let isRolling = false;
+
+function animateRoll(side, onComplete) {
+  if (isRolling) return;
+  isRolling = true;
+
+  // Animujemy TYLKO rzucaną kostkę!
+  const el = document.getElementById(side === "A" ? "faceA" : "faceB");
+  el.classList.add("rolling");
+
+  const animation = setInterval(() => {
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  }, 80);
+
+  setTimeout(() => {
+    clearInterval(animation);
+    el.classList.remove("rolling");
+    isRolling = false;
+    onComplete();
+  }, 650);
+}
+
+function rollA() {
+  animateRoll("A", () => {
+    // Jeśli w trybie splątanym obie kostki były już rzucone, zaczynamy nową rundę pomiaru
+    if (connected && lastA !== -1 && lastB !== -1) {
+      currentState = createFreshState();
+      lastB = -1;
+      document.getElementById("faceB").textContent = "🎲";
+      collapsedBy = null;
+    }
+
+    const pA = getMarginalProbabilities(currentState, "A");
+    lastA = sampleFromProbs(pA);
+    document.getElementById("faceA").textContent = emojis[lastA - 1];
+
+    if (connected) {
+      // Pomiar A redukuje stan kwantowy i zmienia rozkład szans dla B!
+      currentState.collapseA(lastA - 1);
+      if (collapsedBy === null) collapsedBy = "A";
+      document.getElementById("result").textContent =
+        `Wyrzucono ${lastA} na Kostce A — spójrz, jak zmieniły się szanse Kostki B!`;
+    } else {
+      // Tryb zwykły: rzut A nie wpływa na B
+      document.getElementById("result").textContent =
+        `Kostka A: ${lastA} (Kostka B pozostaje niezależna)`;
+    }
+
+    updateAllViews();
+  });
+}
+
+function rollB() {
+  animateRoll("B", () => {
+    // Jeśli w trybie splątanym obie kostki były już rzucone, zaczynamy nową rundę pomiaru
+    if (connected && lastA !== -1 && lastB !== -1) {
+      currentState = createFreshState();
+      lastA = -1;
+      document.getElementById("faceA").textContent = "🎲";
+      collapsedBy = null;
+    }
+
+    const pB = getMarginalProbabilities(currentState, "B");
+    lastB = sampleFromProbs(pB);
+    document.getElementById("faceB").textContent = emojis[lastB - 1];
+
+    if (connected) {
+      // Pomiar B redukuje stan kwantowy i zmienia rozkład szans dla A!
+      currentState.collapseB(lastB - 1);
+      if (collapsedBy === null) collapsedBy = "B";
+      document.getElementById("result").textContent =
+        `Wyrzucono ${lastB} na Kostce B — spójrz, jak zmieniły się szanse Kostki A!`;
+    } else {
+      // Tryb zwykły: rzut B nie wpływa na A
+      document.getElementById("result").textContent =
+        `Kostka B: ${lastB} (Kostka A pozostaje niezależna)`;
+    }
+
+    updateAllViews();
+  });
+}
+
+// ======================================
+// INICJALIZACJA
+// ======================================
+
+for (let i = 0; i < 3; i++) {
+  setupDial("dialA" + i, "A", i);
+  drawDial("dialA" + i, 0, "#58a6ff");
+
+  setupDial("dialB" + i, "B", i);
+  drawDial("dialB" + i, 0, "#bc8cff");
+}
+
+resetRound();
+</script>
+
+</body>
+</html>
